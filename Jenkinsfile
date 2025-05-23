@@ -27,9 +27,11 @@ pipeline {
                     // Usamos 'source' para activar el venv en el shell actual
                     // y luego ejecutamos los comandos de pip
                     sh """
-                        source ${VENV_DIR}/bin/activate
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
+                        bash -c "
+                            source ${VENV_DIR}/bin/activate && \\
+                            pip install --upgrade pip && \\
+                            pip install -r requirements.txt
+                        "
                     """
                     echo "Dependencies installed into virtual environment."
                 }
@@ -45,19 +47,10 @@ pipeline {
             }
         }
 
-        stage('Post-Deployment Verification (Optional)') {
-            steps {
-                script {
-                    echo "Verifying deployment..."
-                    // Por ejemplo: sh "curl -f https://${AZURE_APP_SERVICE_NAME}.azurewebsites.net/"
-                }
-            }
-        }
-    }
-
     post {
         always {
-            cleanWs() // Limpia el espacio de trabajo después de cada ejecución
+            cleanWs()
+            echo "Process Finalized"// Limpia el espacio de trabajo después de cada ejecución
         }
         success {
             echo 'Pipeline completed successfully!'
