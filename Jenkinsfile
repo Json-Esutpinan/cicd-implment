@@ -22,6 +22,26 @@ pipeline {
                 sh 'pip3 install -r requirements.txt'
             }
         }
+        stage('Setup Virtual Environment and Install Dependencies') {
+            steps {
+                script {
+                    // 1. Crear el entorno virtual
+                    sh "python3 -m venv ${VENV_DIR}"
+                    echo "Virtual environment created at ${VENV_DIR}"
+
+                    // 2. Activar el entorno virtual y actualizar pip
+                    // Usamos 'source' para activar el venv en el shell actual
+                    // y luego ejecutamos los comandos de pip
+                    sh """
+                        source ${VENV_DIR}/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    """
+                    echo "Dependencies installed into virtual environment."
+                }
+            }
+        }
+
 
         stage('Build Artifacts (Optional)') {
             steps {
