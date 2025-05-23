@@ -1,64 +1,52 @@
-
 pipeline {
     agent any
 
     environment {
         AZURE_RESOURCE_GROUP = 'SWII-CICD'
-        AZURE_APP_NAME = 'productosjson'
+        AZURE_APP_SERVICE_NAME = 'productosjson'
         AZURE_REGION = 'Canada Central'
+        AZURE_CREDENTIALS_ID = 'TU_ID_CREDENCIALES_AZURE'
     }
 
     stages {
-        stage('Checkout Source Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',url: 'https://github.com/Json-Esutpinan/cicd-implment.git'
+                git branch: 'main', url: 'https://github.com/Json-Esutpinan/cicd-implment.git'
             }
         }
-
-        stage('Install Python Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                
                 sh 'python3 -m pip install --upgrade pip'
                 sh 'pip3 install -r requirements.txt'
             }
         }
-
-        stage('Build Artifacts (Optional)') {
+        stage('Run Unit Tests') {
             steps {
-                script {
-                    echo 'No specific build artifacts for this Flask app.'
-                }
+                sh 'pytest'
             }
         }
-
+        stage('Run Flask App') {
+            steps {
+                sh '''
+                    pkill -f "flask run" || true
+                    export FLASK_APP=app.py
+                    nohup flask run --host=0.0.0.0 --port=5000 > flask.log 2>&1 &
+                '''
+            }
+        }
         stage('Deploy to Azure App Service') {
             steps {
                 azureWebAppPublish azureCredentialsId: "${AZURE_CREDENTIALS_ID}",
-                                    appName: "${AZURE_APP_SERVICE_NAME}",
-                                    resourceGroup: "${AZURE_RESOURCE_GROUP}",
-                                    sourceDirectory: '.'
-            }
-        }
-
-        stage('Post-Deployment Verification (Optional)') {
-            steps {
-                script {
-                    echo "Verifying deployment..."
-                    // Por ejemplo: sh "curl -f https://${AZURE_APP_SERVICE_NAME}.azurewebsites.net/"
-                }
+                                   appName: "${AZURE_APP_SERVICE_NAME}",
+                                   resourceGroup: "${AZURE_RESOURCE_GROUP}",
+                                   sourceDirectory: '.'
             }
         }
     }
 
     post {
         always {
-            cleanWs() // Limpia el espacio de trabajo después de cada ejecución
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check logs for details.'
+            cleanWs()
         }
     }
 }
