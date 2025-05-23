@@ -1,5 +1,5 @@
 import pytest
-from ..app import app, db
+from app import app, db
 from model.Producto import Producto
 from model.Cliente import Cliente
 from model.Pedido import Pedido
