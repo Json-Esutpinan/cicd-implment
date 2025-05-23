@@ -6,6 +6,7 @@ pipeline {
         AZURE_RESOURCE_GROUP = 'SWII-CICD'
         AZURE_APP_NAME = 'productosjson'
         AZURE_REGION = 'Canada Central'
+        VENV_DIR = 'venv' 
     }
 
     stages {
@@ -38,15 +39,6 @@ pipeline {
                         pip install -r requirements.txt
                     """
                     echo "Dependencies installed into virtual environment."
-                }
-            }
-        }
-
-
-        stage('Build Artifacts (Optional)') {
-            steps {
-                script {
-                    echo 'No specific build artifacts for this Flask app.'
                 }
             }
         }
