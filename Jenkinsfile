@@ -4,8 +4,8 @@ pipeline {
     environment {
         AZURE_RESOURCE_GROUP = 'SWII-CICD'
         AZURE_APP_SERVICE_NAME = 'productosjson'
-        // AZURE_REGION = 'Canada Central' // La región no es necesaria para el comando de despliegue
         AZURE_CREDENTIALS_ID = 'azure-service-principal' // ID de la credencial de Jenkins
+        APP_ZIP_FILE = 'app.zip' // Nombre del archivo ZIP a crear
     }
 
     stages {
@@ -34,10 +34,8 @@ pipeline {
                 '''
             }
         } */
-        // La etapa 'Run Flask App' no suele ser necesaria para el despliegue a App Service
-        // ya que Azure se encarga de iniciar la aplicación.
         /*
-        stage('Run Flask App') {
+        stage('Run Flask App') { // Esta etapa no suele ser necesaria para el despliegue a App Service
             steps {
                 sh '''
                 pkill -f "flask run" || true
@@ -48,18 +46,34 @@ pipeline {
             }
         }
         */
+        stage('Create Deployment Package') {
+            steps {
+                sh '''
+                # Listar el contenido para depuración (opcional, pero útil)
+                echo "Contenido del workspace antes de crear el ZIP:"
+                ls -la .
+
+                # Crear el archivo ZIP de la aplicación
+                # Asegúrate de que el comando 'zip' esté disponible en tu VM de Jenkins.
+                # Si tu código está en un subdirectorio (ej. 'cicd-implment'), ajusta la ruta aquí.
+                # Por ejemplo: cd cicd-implment/ && zip -r ${APP_ZIP_FILE} ./*
+                zip -r ${APP_ZIP_FILE} ./*
+
+                echo "Archivo ZIP creado:"
+                ls -la ${APP_ZIP_FILE}
+                '''
+            }
+        }
         stage('Deploy to Azure App Service') {
             steps {
-                // withCredentials inyecta las variables de entorno de tu Service Principal
-                // (AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID)
                 withCredentials([azureServicePrincipal(AZURE_CREDENTIALS_ID)]) {
                     sh '''
                         # Autenticarse con el Service Principal usando Azure CLI
                         az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID" --allow-no-subscription
 
-                        # Desplegar la aplicación web al App Service
-                        # El --src-path . indica que se despliega el contenido del directorio actual
-                        az webapp deploy --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_APP_SERVICE_NAME" --src-path .
+                        # Desplegar el archivo ZIP
+                        # El --type zip es crucial para indicar que se está desplegando un archivo ZIP
+                        az webapp deploy --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_APP_SERVICE_NAME" --src-path "${APP_ZIP_FILE}" --type zip
 
                         # Opcional: Cerrar sesión de Azure CLI después del despliegue
                         az logout
