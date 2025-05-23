@@ -1,12 +1,11 @@
 import os
 
 class Config:
-    @property
-    def SQLALCHEMY_DATABASE_URI(self):
-        DB_USER = os.getenv('DB_USER')
-        DB_PASSWORD = os.getenv('DB_PASSWORD')
-        DB_HOST = os.getenv('DB_HOST')
-        DB_NAME = os.getenv('DB_NAME')
-        return f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+    DB_USER_ENV = 'DB_USER'
+    DB_PASSWORD_ENV = 'DB_PASSWORD'
+    DB_HOST_ENV = 'DB_HOST'
+    DB_NAME_ENV = 'DB_NAME'
+
+    SQLALCHEMY_DATABASE_URI = None # Este valor será sobrescrito en create_app o por TestConfig
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

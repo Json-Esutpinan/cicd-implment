@@ -9,14 +9,12 @@ class TestConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = True
     
-@pytest.fixture(scope='session') # Usar scope='session' para eficiencia
+@pytest.fixture(scope='session')
 def app():
-    # Crea la aplicación con la configuración de prueba
     _app = create_app(test_config=TestConfig)
     with _app.app_context():
         db.create_all()
     yield _app
-    
     
 @pytest.fixture(scope='function')
 def client(app):
@@ -51,7 +49,6 @@ def test_create_cliente(client):
     assert b"Cliente creado" in response.data
 
 def test_create_pedido(client):
-    # Crear cliente y producto primero
     client.post('/api/clientes', json={
         "nombre": "Cliente Uno",
         "email": "cliente@correo.com"
@@ -61,7 +58,6 @@ def test_create_pedido(client):
         "descripcion": "Desc",
         "precio": 10.5
     })
-    # Crear pedido con producto
     response = client.post('/api/pedidos', json={
         "cliente_id": 1,
         "producto_ids": [1]
