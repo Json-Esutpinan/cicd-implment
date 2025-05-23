@@ -26,13 +26,17 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                sh 'pytest'
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
             }
         }
         stage('Run Flask App') {
             steps {
                 sh '''
                     pkill -f "flask run" || true
+                    . venv/bin/activate
                     export FLASK_APP=app.py
                     nohup flask run --host=0.0.0.0 --port=5000 > flask.log 2>&1 &
                 '''
