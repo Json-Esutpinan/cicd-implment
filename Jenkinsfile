@@ -25,7 +25,7 @@ pipeline {
                 '''
             }
         }
-        /* stage('Run Unit Tests') {
+        stage('Run Unit Tests') {
             steps {
                 sh '''
                 . venv/bin/activate
@@ -33,7 +33,7 @@ pipeline {
                 pytest
                 '''
             }
-        } */
+        }
         /*
         stage('Run Flask App') { // Esta etapa no suele ser necesaria para el despliegue a App Service
             steps {
