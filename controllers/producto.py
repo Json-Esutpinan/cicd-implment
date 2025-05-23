@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from model import Db, Cliente, Producto, Pedido
+from model import Cliente, Producto, Pedido
+from model.Db import db
 
 api = Blueprint('api', __name__)
-db = Db().db
 @api.route('/productos/<int:id>', methods=['PUT'])
 def update_producto(id):
     data = request.get_json()

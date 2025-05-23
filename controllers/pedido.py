@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from model import Db, Pedido, Producto
+from model import Pedido, Producto
+from model.Db import db
 
 pedido_api = Blueprint('pedido_api', __name__)
-db = Db().db
 
 @pedido_api.route('/pedidos', methods=['POST'])
 def create_pedido():

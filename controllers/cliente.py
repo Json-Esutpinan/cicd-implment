@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from model import Db, Cliente
+from model import Cliente
+from model.Db import db
 
 cliente_api = Blueprint('cliente_api', __name__)
-db = Db().db
 
 @cliente_api.route('/clientes', methods=['POST'])
 def create_cliente():
