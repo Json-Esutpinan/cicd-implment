@@ -1,19 +1,27 @@
 import pytest
-from app import app, db
+from app import create_app, db
 from model.Producto import Producto
 from model.Cliente import Cliente
 from model.Pedido import Pedido
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+class TestConfig:
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TESTING = True
+    
+@pytest.fixture(scope='session') # Usar scope='session' para eficiencia
+def app():
+    # Crea la aplicación con la configuración de prueba
+    _app = create_app(test_config=TestConfig)
+    with _app.app_context():
+        db.create_all()
+    yield _app
+    
+    
+@pytest.fixture(scope='function')
+def client(app):
     with app.test_client() as client:
-        with app.app_context():
-            db.create_all()
         yield client
-        with app.app_context():
-            db.drop_all()
 
 def test_create_producto(client):
     response = client.post('/api/productos', json={
