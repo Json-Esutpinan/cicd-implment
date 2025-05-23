@@ -46,6 +46,8 @@ pipeline {
                                     sourceDirectory: '.'
             }
         }
+    }
+}
 
     post {
         always {
