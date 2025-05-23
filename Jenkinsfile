@@ -5,7 +5,7 @@ pipeline {
         AZURE_RESOURCE_GROUP = 'SWII-CICD'
         AZURE_APP_SERVICE_NAME = 'productosjson'
         AZURE_REGION = 'Canada Central'
-        AZURE_CREDENTIALS_ID = 'TU_ID_CREDENCIALES_AZURE'
+        AZURE_CREDENTIALS_ID = 'azure-service-principal'
     }
 
     stages {
