@@ -4,8 +4,8 @@ pipeline {
     environment {
         AZURE_RESOURCE_GROUP = 'SWII-CICD'
         AZURE_APP_SERVICE_NAME = 'productosjson'
-        AZURE_CREDENTIALS_ID = 'azure-service-principal' // ID de la credencial de Jenkins
-        APP_ZIP_FILE = 'app.zip' // Nombre del archivo ZIP a crear
+        AZURE_CREDENTIALS_ID = 'azure-service-principal'
+        APP_ZIP_FILE = 'app.zip'
     }
 
     stages {
@@ -34,18 +34,6 @@ pipeline {
                 '''
             }
         }
-        /*
-        stage('Run Flask App') { // Esta etapa no suele ser necesaria para el despliegue a App Service
-            steps {
-                sh '''
-                pkill -f "flask run" || true
-                . venv/bin/activate
-                export FLASK_APP=app.py
-                nohup flask run --host=0.0.0.0 --port=5000 > flask.log 2>&1 &
-                '''
-            }
-        }
-        */
         stage('Create Deployment Package') {
             steps {
                 sh '''
